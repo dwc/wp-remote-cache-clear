@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP Remote Cache Clear
 Version: 0.1
-Plugin URI: 
+Plugin URI: http://danieltwc.com/2011/wp-remote-cache-clear-0-1/
 Description: Clear the WP Super Cache when a specific URL is accessed, or clear a remote WP Super Cache.
 Author: Daniel Westermann-Clark
 Author URI: http://danieltwc.com/
