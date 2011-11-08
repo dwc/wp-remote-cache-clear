@@ -7,6 +7,9 @@ class WPRemoteCacheClearOptionsPage {
     private $options;
     private $title;
 
+    /*
+     * Prepare the options page for display.
+     */
     public function __construct($plugin, $group, $page, $options, $title = 'WP Remote Cache Clear') {
         $this->plugin = $plugin;
         $this->group = $group;
@@ -42,7 +45,7 @@ class WPRemoteCacheClearOptionsPage {
      */
     public function sanitize_settings($input) {
         $output = $input;
-        $output['db_version'] = $this->plugin->db_version;
+        $output['db_version'] = $this->plugin->db_version();
 
         return $output;
     }
@@ -76,6 +79,9 @@ class WPRemoteCacheClearOptionsPage {
 <?php
 	}
 
+    /*
+     * Describe the options used to configure the server.
+     */
     public function describe_server_options() {
         echo '<p>The following options control access to the endpoint for clearing the cache.</p>';
     }
@@ -87,7 +93,7 @@ class WPRemoteCacheClearOptionsPage {
 		$server_key = $this->options['server_key'];
 		$this->display_input_text_field('server_key', $server_key);
 ?>
-The secret key that clients must use to clear the cache on this blog.
+The secret key that clients must use to clear the cache on this blog, passed in the <code><?php esc_attr_e($this->plugin->query_var()); ?></code> parameter.
 <?php
 	}
 
@@ -102,6 +108,9 @@ A <a href="http://www.php.net/manual/en/reference.pcre.pattern.syntax.php">regul
 <?php
 	}
 
+    /*
+     * Describe the options used to configure the client.
+     */
     public function describe_client_options() {
         echo '<p>The following options configure what URL to access when a post is published in this blog.</p>';
     }
@@ -124,7 +133,7 @@ The URL of the remote instance on which to clear the cache.
 		$client_key = $this->options['client_key'];
 		$this->display_input_text_field('client_key', $client_key);
 ?>
-The key that the server requires for authentication.
+The key that the server requires for authentication, passed in the <code><?php esc_attr_e($this->plugin->query_var()); ?></code> parameter.
 <?php
 	}
 

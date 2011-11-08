@@ -9,12 +9,20 @@ Author URI: http://danieltwc.com/
 */
 
 require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'options-page.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'server.php');
+require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'client.php');
 
 class WPRemoteCacheClearPlugin {
     private $option_name = 'wp_remote_cache_clear_options';
     private $options;
-    public $db_version = 1;
+    private $db_version = 1;
+    private $query_var = 'wp_remote_cache_clear_key';
+    private $server;
+    private $client;
 
+    /*
+     * Load options, create the options page, and create the server and client.
+     */
     public function __construct() {
         $this->options = get_option($this->option_name);
 
@@ -22,6 +30,25 @@ class WPRemoteCacheClearPlugin {
             $options_page = new WPRemoteCacheClearOptionsPage(&$this, $this->option_name, __FILE__, $this->options);
             add_action('admin_init', array(&$this, 'check_options'));
         }
+
+        $this->server = new WPRemoteCacheClearServer($this->options, $this->query_var);
+        $this->client = new WPRemoteCacheClearClient($this->options, $this->query_var);
+    }
+
+    /*
+     * Return the current version of this plugin's options. Used on
+     * upgrade.
+     */
+    public function db_version() {
+        return $this->db_version;
+    }
+
+    /*
+     * Return the name of the query parameter used to clear the cache
+     * by the client and server.
+     */
+    public function query_var() {
+        return $this->query_var;
     }
 
     /*
