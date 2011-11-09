@@ -65,7 +65,7 @@ class WPRemoteCacheClearOptionsPage {
 <div class="wrap">
   <h2><?php esc_attr_e($this->title); ?> Options</h2>
   <form action="options.php" method="post">
-    <?php settings_errors(); ?>
+    <?php if (function_exists('settings_errors')): settings_errors(); endif; ?>
     <?php settings_fields($this->group); ?>
     <?php foreach ($this->sections as $section): do_settings_sections($section); endforeach; ?>
     <p class="submit">
