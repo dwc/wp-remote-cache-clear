@@ -45,7 +45,16 @@ class WPRemoteCacheClearClient {
      */
     public function make_request() {
         $url = $this->build_url();
-        wp_remote_fopen($url);
+        $response = wp_remote_get($url, array('timeout' => 5));
+
+        if (is_wp_error($response)) {
+            error_log("Error making request to clear cache: " . $response->get_error_message());
+        }
+        else {
+            error_log("Requested cache clear successfully");
+        }
+
+        return $response;
     }
 }
 ?>

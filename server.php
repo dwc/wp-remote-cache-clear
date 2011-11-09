@@ -43,9 +43,15 @@ class WPRemoteCacheClearServer {
      */
     public function handle_request(&$request) {
         if ($this->verify_request($request)) {
+            error_log("Valid request from " . $_SERVER['REMOTE_ADDR']);
+
             if (function_exists('wp_cache_clear_cache')) {
+                error_log("Clearing WP Super Cache via " . $_SERVER['REMOTE_ADDR']);
                 wp_cache_clear_cache();
             }
+        }
+        else {
+            error_log("Invalid request from " . $_SERVER['REMOTE_ADDR']);
         }
     }
 
