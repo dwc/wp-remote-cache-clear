@@ -50,9 +50,6 @@ class WPRemoteCacheClearServer {
                 wp_cache_clear_cache();
             }
         }
-        else {
-            error_log("Invalid request from " . $_SERVER['REMOTE_ADDR']);
-        }
     }
 
     /*
