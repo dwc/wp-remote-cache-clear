@@ -2,15 +2,17 @@
 class WPRemoteCacheClearClient {
     private $options;
     private $query_var;
+    private $debug_func;
     private $configured = false;
 
     /*
      * If the client is configured, set it up to make the cache
      * clearing request.
      */
-    public function __construct($options, $query_var) {
+    public function __construct($options, $query_var, $debug_func = 'error_log') {
         $this->options = $options;
         $this->query_var = $query_var;
+        $this->debug_func = $debug_func;
 
         if (! empty($this->options['client_remote_url']) && ! empty($this->options['client_key'])) {
             add_action('publish_post', array(&$this, 'make_request'));
@@ -48,10 +50,10 @@ class WPRemoteCacheClearClient {
         $response = wp_remote_get($url, array('timeout' => 5));
 
         if (is_wp_error($response)) {
-            error_log("Error making request to clear cache: " . $response->get_error_message());
+            call_user_func($this->debug_func, "Error making request to clear cache: " . $response->get_error_message());
         }
         else {
-            error_log("Requested cache clear successfully");
+            call_user_func($this->debug_func, "Requested cache clear successfully");
         }
 
         return $response;
