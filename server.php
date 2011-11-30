@@ -44,23 +44,32 @@ class WPRemoteCacheClearServer {
      * If the request is verified, clear the cache.
      */
     public function handle_request(&$request) {
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $identification = $this->client_identification();
 
         if (array_key_exists($this->query_var, $request->query_vars)) {
-            call_user_func($this->debug_func, "Received request to clear WP Cache from $ip");
+            call_user_func($this->debug_func, "Received request to clear WP Cache from $identification");
 
             if ($this->verify_request($request)) {
-                call_user_func($this->debug_func, "Valid request to clear WP Cache from $ip");
+                call_user_func($this->debug_func, "Valid request to clear WP Cache from $identification");
 
                 if (function_exists('wp_cache_clear_cache')) {
-                    call_user_func($this->debug_func, "Clearing WP Cache via $ip");
+                    call_user_func($this->debug_func, "Clearing WP Cache via $identification");
                     wp_cache_clear_cache();
                 }
             }
             else {
-                call_user_func($this->debug_func, "Invalid request to clear WP Cache from $ip");
+                call_user_func($this->debug_func, "Invalid request to clear WP Cache from $identification");
             }
         }
+    }
+
+    /*
+     * Return a string useful for identifying the client in logs.
+     */
+    private function client_identification() {
+        $identification = $_SERVER['REMOTE_ADDR'] . ' [' . $_SERVER['HTTP_USER_AGENT'] . ']';
+
+        return $identification;
     }
 
     /*
