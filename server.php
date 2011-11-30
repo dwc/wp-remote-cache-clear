@@ -52,11 +52,6 @@ class WPRemoteCacheClearServer {
             if ($this->verify_request($request)) {
                 call_user_func($this->debug_func, "Valid request to clear WP Cache from $identification");
 
-                if (function_exists('wp_cache_clear_cache')) {
-                    call_user_func($this->debug_func, "Clearing WP Cache via $identification");
-                    wp_cache_clear_cache();
-                }
-
                 if ((bool) $this->options['server_delete_transients']) {
                     call_user_func($this->debug_func, "Deleting transients via $identification");
 
@@ -68,6 +63,11 @@ class WPRemoteCacheClearServer {
                     else {
                         call_user_func($this->debug_func, "Error deleting transients via $identification");
                     }
+                }
+
+                if (function_exists('wp_cache_clear_cache')) {
+                    call_user_func($this->debug_func, "Clearing WP Cache via $identification");
+                    wp_cache_clear_cache();
                 }
             }
             else {
