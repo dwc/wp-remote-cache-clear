@@ -38,6 +38,7 @@ class WPRemoteCacheClearOptionsPage {
 
         add_settings_field('wp_remote_cache_clear_server_key', 'Secret key', array(&$this, 'display_option_server_key'), $server_section, $server_section);
         add_settings_field('wp_remote_cache_clear_server_allowed_ip_regex', 'Allow IPs matching', array(&$this, 'display_option_server_allowed_ip_regex'), $server_section, $server_section);
+        add_settings_field('wp_remote_cache_clear_server_delete_transients', 'Delete transients?', array(&$this, 'display_option_server_delete_transients'), $server_section, $server_section);
 
         $this->sections[] = $client_section = 'wp_remote_cache_clear_client';
         add_settings_section($client_section, 'Client Settings', array(&$this, 'describe_client_options'), $client_section);
@@ -128,13 +129,24 @@ The secret key that clients must use to clear the cache on this blog, passed in 
     }
 
     /*
-     * Display the allowed IP regular express field.
+     * Display the allowed IP regular expression field.
      */
     public function display_option_server_allowed_ip_regex() {
         $allowed_ip_regex = $this->options['server_allowed_ip_regex'];
         $this->display_input_text_field('server_allowed_ip_regex', $allowed_ip_regex);
 ?>
 A <a href="http://www.php.net/manual/en/reference.pcre.pattern.syntax.php">regular expression</a> that client IP addresses must match to clear the cache.
+<?php
+    }
+
+    /*
+     * Display the checkbox for enabling deletion of transients.
+     */
+    public function display_option_server_delete_transients() {
+        $delete_transients = (bool) $this->options['server_delete_transients'];
+        $this->display_checkbox_field('server_delete_transients', $delete_transients);
+?>
+Turn this on to removed cached RSS and Atom feeds fetched by WordPress when a successful request is received.
 <?php
     }
 

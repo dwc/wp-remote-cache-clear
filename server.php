@@ -56,6 +56,19 @@ class WPRemoteCacheClearServer {
                     call_user_func($this->debug_func, "Clearing WP Cache via $identification");
                     wp_cache_clear_cache();
                 }
+
+                if ((bool) $this->options['server_delete_transients']) {
+                    call_user_func($this->debug_func, "Deleting transients via $identification");
+
+                    $deleted = $this->delete_transients();
+
+                    if ($deleted !== false) {
+                        call_user_func($this->debug_func, "Deleted $deleted transients via $identification");
+                    }
+                    else {
+                        call_user_func($this->debug_func, "Error deleting transients via $identification");
+                    }
+                }
             }
             else {
                 call_user_func($this->debug_func, "Invalid request to clear WP Cache from $identification");
@@ -97,6 +110,21 @@ class WPRemoteCacheClearServer {
         }
 
         return (bool) preg_match($allowed_ip_regex, $_SERVER['REMOTE_ADDR']);
+    }
+
+    /*
+     * Delete the transient objects for RSS and Atom feeds cached by
+     * WordPress.
+     */
+    private function delete_transients() {
+        global $wpdb;
+
+        $sql = $wpdb->prepare(
+            "DELETE FROM $wpdb->options WHERE `option_name` LIKE %s",
+            '_transient%_feed_%'
+        );
+
+        return $wpdb->query($sql);
     }
 }
 ?>
