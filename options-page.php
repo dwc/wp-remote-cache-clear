@@ -146,7 +146,7 @@ A <a href="http://www.php.net/manual/en/reference.pcre.pattern.syntax.php">regul
         $delete_transients = (bool) $this->options['server_delete_transients'];
         $this->display_checkbox_field('server_delete_transients', $delete_transients);
 ?>
-Turn this on to removed cached RSS and Atom feeds fetched by WordPress when a successful request is received.
+Turn this on to remove cached RSS and Atom feeds fetched by WordPress when a successful request is received.
 <?php
     }
 
