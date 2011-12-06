@@ -18,6 +18,14 @@ class WPRemoteCacheClearServer {
             add_filter('query_vars', array(&$this, 'add_query_var'));
             add_action('parse_request', array(&$this, 'handle_request'));
 
+            if ((bool) $this->options['server_delete_transients']) {
+                add_action('wp_remote_cache_clear_valid_request', array(&$this, 'delete_transients'), 10);
+            }
+
+            if (function_exists('wp_cache_clear_cache')) {
+                add_action('wp_remote_cache_clear_valid_request', array(&$this, 'clear_cache'), 11);
+            }
+
             $this->configured = true;
         }
     }
@@ -51,27 +59,11 @@ class WPRemoteCacheClearServer {
 
             if ($this->verify_request($request)) {
                 call_user_func($this->debug_func, "Valid request to clear WP Cache from $identification");
-
-                if ((bool) $this->options['server_delete_transients']) {
-                    call_user_func($this->debug_func, "Deleting transients via $identification");
-
-                    $deleted = $this->delete_transients();
-
-                    if ($deleted !== false) {
-                        call_user_func($this->debug_func, "Deleted $deleted transients via $identification");
-                    }
-                    else {
-                        call_user_func($this->debug_func, "Error deleting transients via $identification");
-                    }
-                }
-
-                if (function_exists('wp_cache_clear_cache')) {
-                    call_user_func($this->debug_func, "Clearing WP Cache via $identification");
-                    wp_cache_clear_cache();
-                }
+                do_action('wp_remote_cache_clear_valid_request', $request);
             }
             else {
                 call_user_func($this->debug_func, "Invalid request to clear WP Cache from $identification");
+                do_action('wp_remote_cache_clear_invalid_request', $request);
             }
         }
     }
@@ -116,15 +108,37 @@ class WPRemoteCacheClearServer {
      * Delete the transient objects for RSS and Atom feeds cached by
      * WordPress.
      */
-    private function delete_transients() {
+    public function delete_transients() {
         global $wpdb;
+
+        $identification = $this->client_identification();
+        call_user_func($this->debug_func, "Deleting transients via $identification");
 
         $sql = $wpdb->prepare(
             "DELETE FROM $wpdb->options WHERE `option_name` LIKE %s",
             '_transient%_feed_%'
         );
 
-        return $wpdb->query($sql);
+        $deleted = $wpdb->query($sql);
+
+        if ($deleted !== false) {
+            call_user_func($this->debug_func, "Deleted $deleted transients via $identification");
+        }
+        else {
+            call_user_func($this->debug_func, "Error deleting transients via $identification");
+        }
+
+        return $deleted;
+    }
+
+    /*
+     * Clear the WordPress cache.
+     */
+    public function clear_cache() {
+        $identification = $this->client_identification();
+        call_user_func($this->debug_func, "Clearing WP Cache via $identification");
+
+        wp_cache_clear_cache();
     }
 }
 ?>
