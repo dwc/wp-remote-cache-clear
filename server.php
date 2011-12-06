@@ -57,9 +57,18 @@ class WPRemoteCacheClearServer {
         if (array_key_exists($this->query_var, $request->query_vars)) {
             call_user_func($this->debug_func, "Received request to clear WP Cache from $identification");
 
+            // Check that we have not cleared the cache too recently
+            $time_cleared = intval(get_option('wp_remote_cache_clear_time_cleared'));
+            if (time() - $time_cleared < $this->options['server_min_seconds']) {
+                call_user_func($this->debug_func, "Skipping request from $identification; last cleared on " . strftime('%c', $time_cleared));
+                return;
+            }
+
             if ($this->verify_request($request)) {
                 call_user_func($this->debug_func, "Valid request to clear WP Cache from $identification");
                 do_action('wp_remote_cache_clear_valid_request', $request);
+
+                update_option('wp_remote_cache_clear_time_cleared', time());
             }
             else {
                 call_user_func($this->debug_func, "Invalid request to clear WP Cache from $identification");

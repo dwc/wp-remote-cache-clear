@@ -15,7 +15,7 @@ require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'client.php');
 class WPRemoteCacheClearPlugin {
     private $option_name = 'wp_remote_cache_clear_options';
     private $options;
-    private $db_version = 3;
+    private $db_version = 4;
     private $query_var = 'wp_remote_cache_clear_key';
     private $server;
     private $client;
@@ -76,6 +76,7 @@ class WPRemoteCacheClearPlugin {
         $default_options = array(
             'server_key' => $this->generate_key(),
             'server_allowed_ip_regex' => '^127\.0\.0\.1$',
+            'server_min_seconds' => 300,
             'server_delete_transients' => true,
             'client_remote_url' => '',
             'client_key' => '',
